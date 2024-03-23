@@ -1,0 +1,103 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+const AddUserModal = () => {
+    const navigate = useNavigate();
+    const [formData, setFormData] = useState({
+        username: '',
+        first_name: '',
+        last_name: '',
+        email: '',
+        date_of_birth: '',
+        created_at: new Date().toISOString().slice(0, 19).replace('T', ' '),
+        project_id: ''
+    });
+    const [projects, setProjects] = useState([]);
+
+    useEffect(() => {
+        fetchProjects();
+    }, []);
+
+    const fetchProjects = async () => {
+        try {
+            const response = await fetch('http://127.0.0.1:3002/projectlist');
+            const data = await response.json();
+            console.log('project list,', data);
+
+            setProjects(data);
+        
+        } catch (error) {
+            console.error('Error fetching projects:', error);
+        }
+    };
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            await fetch('http://127.0.0.1:3002/add-user', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+
+            navigate('/');
+        } catch (error) {
+            console.error('Error adding user:', error);
+        }
+    };
+
+    const handlecancel=()=>{
+
+        navigate('/')
+    };
+    return (
+        <div className="container">
+            <h2>Add User</h2>
+            <form onSubmit={handleSubmit}>
+                <div className="mb-3">
+                    <label htmlFor="username" className="form-label">Username</label>
+                    <input type="text" className="form-control" id="username" name="username" value={formData.username} onChange={handleInputChange} />
+                </div>
+                <div className="mb-3">
+                    <label htmlFor="project_name" className="form-label">Project</label>
+                    <select className="form-select" id="project_name" name="project_name" value={formData.project_name} onChange={handleInputChange}>
+                        <option value="">Select Project</option>
+                        {projects.map(project => (
+                            <option key={project.project_id} value={project.project_id}>{project.project_name}</option>
+
+                        ))}
+                    </select>
+
+                    <div className="mb-3">
+                        <label htmlFor="first_name" className="form-label">First Name</label>
+                        <input type="text" className="form-control" id="first_name" name="first_name" value={formData.first_name} onChange={handleInputChange} />
+                    </div>
+                    <div className="mb-3">
+                        <label htmlFor="last_name" className="form-label">Last Name</label>
+                        <input type="text" className="form-control" id="last_name" name="last_name" value={formData.last_name} onChange={handleInputChange} />
+                    </div>
+                    <div className="mb-3">
+                        <label htmlFor="email" className="form-label">Email</label>
+                        <input type="email" className="form-control" id="email" name="email" value={formData.email} onChange={handleInputChange} />
+                    </div>
+                    <div className="mb-3">
+                        <label htmlFor="date_of_birth" className="form-label">Date of Birth</label>
+                        <input type="date" className="form-control" id="date_of_birth" name="date_of_birth" value={formData.date_of_birth} onChange={handleInputChange} />
+                    </div>
+                </div>
+                <button type="submit" className="btn btn-primary">Submit</button>
+                <button type="submit" className="btn btn-primary" onClick={handlecancel}>Cancel</button>
+
+            </form>
+        </div>
+    );
+};
+
+export default AddUserModal;
