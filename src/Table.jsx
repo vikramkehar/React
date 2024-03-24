@@ -7,7 +7,7 @@ const Table = () => {
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
-    // Define fetchData outside of useEffect to make it accessible in handleDelete
+    // Defining fetchData outside of useEffect to make it accessible in handleDelete
     const fetchData = async () => {
         try {
             const response = await fetch('http://127.0.0.1:3002/userlist');
@@ -23,7 +23,7 @@ const Table = () => {
     };
 
     useEffect(() => {
-        fetchData(); // Call fetchData initially to populate the table
+        fetchData(); //fetching userlist first time
     }, []);
 
     const columns = React.useMemo(
@@ -85,6 +85,7 @@ const Table = () => {
     };
 
     const handleDelete = async (id) => {
+        console.log(id)
         try {
             const response = await fetch(`http://127.0.0.1:3002/deleteuser/${id}`, {
                 method: 'DELETE',
@@ -94,14 +95,13 @@ const Table = () => {
                 throw new Error('Failed to delete user');
             }
     
-            // Re-fetch the user list to update the table
+            // Re-fetching the user list to update the table
             fetchData();
         } catch (error) {
             console.error('Error deleting user:', error);
         }
     };
     const handleAddUser = () => {
-        //alert("Add user");
         navigate('/add-user')
     }
 

@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 const EditUserModal = () => {
     const navigate = useNavigate();
-    const { id } = useParams(); // Get the user ID from the URL
+    const { id } = useParams(); 
     const [formData, setFormData] = useState({
         username: '',
         first_name: '',
@@ -13,6 +13,25 @@ const EditUserModal = () => {
         created_at: '',
         project_id: ''
     });
+
+    const [projects, setProjects] = useState([]);
+
+    useEffect(() => {
+        fetchProjects();
+    }, []);
+
+    const fetchProjects = async () => {
+        try {
+            const response = await fetch('http://127.0.0.1:3002/projectlist');
+            const data = await response.json();
+            console.log('project list,', data);
+
+            setProjects(data);
+        
+        } catch (error) {
+            console.error('Error fetching projects:', error);
+        }
+    };
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -68,10 +87,14 @@ const EditUserModal = () => {
                     <label htmlFor="username" className="form-label">Username</label>
                     <input type="text" className="form-control" id="username" name="username" value={formData.username} onChange={handleInputChange} />
                 </div>
-                <div className="mb-3">
-                    <label htmlFor="project_id" className="form-label">Project ID</label>
-                    <input type="integer" className="form-control" id="project_id" name="project_id" value={formData.project_id} onChange={handleInputChange} />
-                </div>
+                <label htmlFor="project_name" className="form-label">Project</label>
+                    <select className="form-select" id="project_name" name="project_name" value={formData.project_name} onChange={handleInputChange}>
+                        <option value="">Select Project</option>
+                        {projects.map(project => (
+                            <option key={project.project_id} value={project.project_id}>{project.project_name}</option>
+
+                        ))}
+                    </select>
                 <div className="mb-3">
                     <label htmlFor="first_name" className="form-label">First Name</label>
                     <input type="text" className="form-control" id="first_name" name="first_name" value={formData.first_name} onChange={handleInputChange} />
